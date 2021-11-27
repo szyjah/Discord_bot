@@ -18,13 +18,16 @@ class Song():
         ydl = youtube_dl.YoutubeDL({'outtmpl': '%(id)s.%(ext)s', 'quiet': True})
         with ydl:
             result = ydl.extract_info(url, download=False, )
-
         if 'entries' in result:
             self.video = result['entries'][0]
         else:
             self.video = result
         
-        self.title = result["title"]    
+        self.title = result["title"]         
+        self.is_live = False
+        if result["is_live"] == True:
+            self.is_live = True
+            return      
         self.duration = str(datetime.timedelta(seconds=result["duration"]))
         for x in result["formats"]:
             if x["format_id"] == "251":
@@ -74,7 +77,7 @@ class YTPlayer(commands.Cog):
         await ctx.send("Nie mam ochoty działać poprawnie | "+ str(error)) 
 
     @commands.command(name='play')
-    async def _play(self,ctx: commands.Context, *args):     
+    async def _play(self,ctx: commands.Context, *args):
         """Play audio form youtube. Uses first result of a youtube search."""
         if len(args) == 0:
             await ctx.send("pierdol sie")
@@ -93,6 +96,9 @@ class YTPlayer(commands.Cog):
                 else:
                     video_url = find_video_url(args)
                     song = Song(video_url)
+                    if song.is_live == True:
+                        await ctx.send("'" + song.title + "' is a stream, you doofus!" )
+                        return
                     self.queue.append(song)
 
                     if len(self.bot.voice_clients) != 0:
