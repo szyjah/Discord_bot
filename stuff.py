@@ -20,13 +20,8 @@ class Stuff(commands.Cog):
         self.bot = bot
         self.voice = None
         self.settings = settings
-        self.channel = None
-        self.timezone = None
-    
-    @commands.Cog.listener()
-    async def on_ready(self):
         self.channel = self.bot.get_channel(self.settings.channel_id)
-        self.timezone = self.settings.timezone
+        self.timezone = self.settings.timezone   
 
     def cog_unload(self):
         pass
@@ -147,21 +142,26 @@ class Stuff(commands.Cog):
             elif re.search('@self',msg) != None:
                 await message.channel.send(message.author.mention+' ( ͡° ͜ʖ ͡°)')
 
+            reply_to_bot = False
+            if message.type.name == "reply":
+                if message.reference.resolved.author == self.bot.user:
+                    reply_to_bot = True
+
             #Hello and goodbye and other stuff
-            if self.bot.user.mentioned_in(message):
+            if self.bot.user.mentioned_in(message) or reply_to_bot:
                 async with message.channel.typing():
-                    if re.search('((dzie([ń|n]) dobry)|(cze([s|ś][c|ć]))) .*', msg) != None:
+                    if re.search('((dzie([ń|n]) dobry)|(cze([s|ś][c|ć]))).*', msg) != None:
                         await message.channel.send('Dzień dobry! '+message.author.mention)
-                    elif re.search('dobranoc .*', msg) != None:
+                    elif re.search('dobranoc.*', msg) != None:
                         await message.channel.send('Dobranoc! '+message.author.mention)
-                    elif re.search('wypierdalaj .*', msg) != None:
+                    elif re.search('wypierdalaj.*', msg) != None:
                         await message.channel.send('Sam wypierdalaj '+message.author.mention)
-                    elif re.search('[\?] .*', msg) != None or re.search('.* [\?]',msg):
+                    elif re.search('[\?].*', msg) != None or re.search('.* [\?]',msg):
                         emoji = discord.utils.get(message.guild.emojis, name='kannahm')
                         await message.add_reaction(emoji)
                     else:
                         #Tak tutaj napewnie nie dzieją sie dziwne rzeczy
-                        if self.bot.user.id in message.raw_mentions:
+                        if self.bot.user.id in message.raw_mentions or reply_to_bot:
                             await message.channel.send(str(random.choice(response))+' '+message.author.mention)
 
             if re.search("^.*[K|k][T|t][O|o] [P|p][Y|y][T|t][A|a][L|l|Ł|ł].*$", msg) != None:
