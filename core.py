@@ -40,6 +40,8 @@ class Core(commands.Cog, name='Core'):
         emoji = discord.utils.get(ctx.guild.emojis, name='nyan')
         if emoji:
             await ctx.send(ctx.author.mention+" I'm alive "+str(emoji))
+        else:
+            await ctx.send(ctx.author.mention+" I'm alive but no emoji")
 
     @commands.command(name='cls')
     @commands.has_permissions(manage_guild=True)
@@ -81,7 +83,7 @@ class Core(commands.Cog, name='Core'):
             await ctx.send('Something went wrong')
             pass
 
-    @commands.command(name='archive-whitelist')
+    @commands.command(name='archive-whitelist', aliases=['archive'])
     @commands.has_permissions(manage_guild=True)
     async def _archive(self,ctx):
         """Function for archiving text channels with whitelist"""
@@ -128,11 +130,6 @@ class Core(commands.Cog, name='Core'):
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix= '.', intents=intents)
-bot.load_extension('stuff')
-bot.load_extension('sounds')
-bot.load_extension('ytplayer')
-# bot.load_extension('timer')
-bot.add_cog(Core(bot))
 
 @bot.event
 async def on_ready():
@@ -140,6 +137,10 @@ async def on_ready():
 
     logger.info('Logged in as {0.user}'.format(bot))
     await bot.change_presence(activity=discord.Game(name='WEEEEEEEEEEEEEEEEEEEEEEEEEEE'))
+    await bot.load_extension('stuff')
+    await bot.load_extension('sounds')
+    await bot.load_extension('ytplayer')
+    await bot.add_cog(Core(bot))
     #load()
 
 

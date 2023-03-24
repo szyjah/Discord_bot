@@ -9,7 +9,10 @@ RUN apk update && \
         apk add make && \
         apk add opus-dev && \
         apk add opus && \
-        apk add ffmpeg
-COPY . .
+        apk add ffmpeg && \
+        apk add espeak && \
+        apk add git
+COPY requirements.txt .
 RUN python -m pip install -r requirements.txt
+COPY . .
 CMD [ "python", "start_bot.py" ]
